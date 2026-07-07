@@ -10,7 +10,7 @@ from app.api.deps import get_session
 from app.core.enums import CabinClass, TripType
 from app.db.base import Base
 from app.main import app
-from app.models import FlightOffer, PriceSnapshot, ProviderLog, Watchlist, WatchlistSegment
+from app.models import Alert, FlightOffer, PriceSnapshot, ProviderLog, Watchlist, WatchlistSegment
 from app.services.watchlist_expansion_service import WatchlistExpansionService
 
 
@@ -52,7 +52,7 @@ def small_round_trip_payload() -> dict:
                 "max_trip_days": 14,
             }
         ],
-        "max_price": "900.00",
+        "max_price": "99999.00",
     }
 
 
@@ -106,6 +106,7 @@ def test_manual_run_persists_offers_snapshots_and_provider_logs() -> None:
         assert result["offers_created"] >= 1
         assert result["snapshots_created"] == result["offers_found"]
         assert result["provider_logs_created"] == 1
+        assert result["alerts_created"] >= result["offers_found"]
 
         with SessionLocal() as db:
             assert db.scalar(select(func.count()).select_from(FlightOffer)) == result["offers_created"]
@@ -114,6 +115,7 @@ def test_manual_run_persists_offers_snapshots_and_provider_logs() -> None:
                 == result["snapshots_created"]
             )
             assert db.scalar(select(func.count()).select_from(ProviderLog)) == 1
+            assert db.scalar(select(func.count()).select_from(Alert)) == result["alerts_created"]
     finally:
         clear_overrides()
 

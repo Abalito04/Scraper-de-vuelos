@@ -3,13 +3,16 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_session
 from app.core.enums import TripType
+from app.repositories.alert_repository import AlertRepository
 from app.repositories.flight_offer_repository import FlightOfferRepository
 from app.repositories.price_snapshot_repository import PriceSnapshotRepository
 from app.repositories.provider_log_repository import ProviderLogRepository
 from app.repositories.watchlist_repository import WatchlistRepository
+from app.schemas.alert import AlertRead
 from app.schemas.common import PaginatedResponse
 from app.schemas.search import ManualSearchResult
 from app.schemas.watchlist import WatchlistCreate, WatchlistRead, WatchlistSummary, WatchlistUpdate
+from app.services.alert_service import AlertService
 from app.services.flight_search_service import FlightSearchService, WatchlistInactiveError
 from app.services.watchlist_expansion_service import TooManyCombinationsError
 from app.services.watchlist_service import WatchlistNotFoundError, WatchlistService
@@ -27,7 +30,12 @@ def get_flight_search_service(db: Session = Depends(get_session)) -> FlightSearc
         flight_offer_repository=FlightOfferRepository(db),
         price_snapshot_repository=PriceSnapshotRepository(db),
         provider_log_repository=ProviderLogRepository(db),
+        alert_repository=AlertRepository(db),
     )
+
+
+def get_alert_service(db: Session = Depends(get_session)) -> AlertService:
+    return AlertService(alert_repository=AlertRepository(db))
 
 
 @router.post("", response_model=WatchlistRead, status_code=status.HTTP_201_CREATED)
@@ -97,3 +105,13 @@ def run_watchlist_search(
         raise HTTPException(status_code=400, detail="Watchlist is inactive") from exc
     except TooManyCombinationsError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/{watchlist_id}/alerts", response_model=PaginatedResponse[AlertRead])
+def list_watchlist_alerts(
+    watchlist_id: int,
+    limit: int = Query(default=20, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    service: AlertService = Depends(get_alert_service),
+) -> PaginatedResponse[AlertRead]:
+    return service.list(watchlist_id=watchlist_id, limit=limit, offset=offset)

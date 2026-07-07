@@ -288,6 +288,8 @@ GET    http://localhost:8000/api/v1/watchlists/{watchlist_id}
 PATCH  http://localhost:8000/api/v1/watchlists/{watchlist_id}
 DELETE http://localhost:8000/api/v1/watchlists/{watchlist_id}
 POST   http://localhost:8000/api/v1/watchlists/{watchlist_id}/run
+GET    http://localhost:8000/api/v1/watchlists/{watchlist_id}/alerts
+GET    http://localhost:8000/api/v1/alerts
 ```
 
 ### Backend sin Docker
@@ -371,6 +373,8 @@ Fase 2 — Modelos de base de datos y migración inicial: completa
 Fase 3 — CRUD de watchlists: completa
 Fase 4 — Provider abstraction y MockFlightProvider: completa
 Fase 5 — Search engine y guardado de snapshots: completa
+Fase 6 — Motor de reglas de alerta: completa
+Fase 7 — Notificaciones Telegram/Null: completa
 ```
 
 Orden recomendado:

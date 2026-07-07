@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     mock_provider_min_price: int = 500
     mock_provider_max_price: int = 1800
     max_combinations_per_watchlist: int = 200
+    notification_provider: str = "null"
+    telegram_bot_token: str | None = None
+    telegram_default_chat_id: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

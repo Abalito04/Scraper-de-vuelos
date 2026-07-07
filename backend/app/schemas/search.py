@@ -9,3 +9,5 @@ class ManualSearchResult(BaseModel):
     offers_created: int
     snapshots_created: int
     provider_logs_created: int
+    alerts_created: int = 0
+    alerts_sent: int = 0

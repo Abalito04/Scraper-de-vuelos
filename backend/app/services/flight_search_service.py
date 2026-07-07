@@ -2,15 +2,18 @@ from hashlib import sha256
 from time import perf_counter
 
 from app.core.config import Settings, get_settings
-from app.core.enums import ProviderLogStatus
+from app.core.enums import AlertStatus, ProviderLogStatus
 from app.models import FlightOffer, PriceSnapshot, ProviderLog
+from app.notifications import NotificationService
 from app.providers import ProviderManager
 from app.providers.normalized import FlightSearchRequest, NormalizedFlightOffer
+from app.repositories.alert_repository import AlertRepository
 from app.repositories.flight_offer_repository import FlightOfferRepository
 from app.repositories.price_snapshot_repository import PriceSnapshotRepository
 from app.repositories.provider_log_repository import ProviderLogRepository
 from app.repositories.watchlist_repository import WatchlistRepository
 from app.schemas.search import ManualSearchResult
+from app.services.alert_service import AlertService
 from app.services.watchlist_expansion_service import WatchlistExpansionService
 from app.services.watchlist_service import WatchlistNotFoundError
 
@@ -27,6 +30,8 @@ class FlightSearchService:
         flight_offer_repository: FlightOfferRepository,
         price_snapshot_repository: PriceSnapshotRepository,
         provider_log_repository: ProviderLogRepository,
+        alert_repository: AlertRepository | None = None,
+        notification_service: NotificationService | None = None,
         provider_manager: ProviderManager | None = None,
         settings: Settings | None = None,
     ) -> None:
@@ -34,8 +39,18 @@ class FlightSearchService:
         self.flight_offer_repository = flight_offer_repository
         self.price_snapshot_repository = price_snapshot_repository
         self.provider_log_repository = provider_log_repository
+        self.alert_repository = alert_repository
         self.settings = settings or get_settings()
         self.provider_manager = provider_manager or ProviderManager(settings=self.settings)
+        self.alert_service = (
+            AlertService(
+                alert_repository=alert_repository,
+                notification_service=notification_service,
+                settings=self.settings,
+            )
+            if alert_repository is not None
+            else None
+        )
         self.expansion_service = WatchlistExpansionService(
             max_combinations=self.settings.max_combinations_per_watchlist
         )
@@ -52,6 +67,8 @@ class FlightSearchService:
         offers_created = 0
         snapshots_created = 0
         provider_logs_created = 0
+        alerts_created = 0
+        alerts_sent = 0
 
         try:
             for request in requests:
@@ -83,6 +100,10 @@ class FlightSearchService:
                     offer, created = self._persist_offer(watchlist.id, normalized_offer)
                     if created:
                         offers_created += 1
+                    if self.alert_service is not None:
+                        alerts = self.alert_service.evaluate_offer(watchlist=watchlist, offer=offer)
+                        alerts_created += len(alerts)
+                        alerts_sent += sum(1 for alert in alerts if alert.status == AlertStatus.SENT)
                     self.price_snapshot_repository.add(
                         PriceSnapshot(
                             watchlist_id=watchlist.id,
@@ -107,6 +128,8 @@ class FlightSearchService:
             offers_created=offers_created,
             snapshots_created=snapshots_created,
             provider_logs_created=provider_logs_created,
+            alerts_created=alerts_created,
+            alerts_sent=alerts_sent,
         )
 
     def _persist_offer(
