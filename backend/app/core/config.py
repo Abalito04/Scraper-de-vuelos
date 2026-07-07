@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+psycopg://fare_radar:fare_radar@postgres:5432/fare_radar"
     redis_url: str = "redis://redis:6379/0"
     flight_provider: str = "mock"
+    mock_provider_seed: int = 12345
+    mock_provider_min_price: int = 500
+    mock_provider_max_price: int = 1800
+    max_combinations_per_watchlist: int = 200
 
     model_config = SettingsConfigDict(
         env_file=".env",
