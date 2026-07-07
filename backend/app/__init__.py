@@ -1,0 +1,1 @@
+"""FareRadar backend application package."""

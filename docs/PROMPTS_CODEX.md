@@ -15,6 +15,9 @@ Vamos a desarrollar un proyecto llamado FareRadar.
 
 FareRadar es una aplicación web para crear, monitorear y recibir alertas de ofertas de vuelos. No debe estar limitada a un origen o destino fijo. El usuario debe poder crear watchlists con múltiples orígenes, múltiples destinos, rangos de fechas, duración mínima/máxima del viaje, precio máximo, cantidad máxima de escalas, tipo de viaje y reglas de alerta.
 
+Repositorio oficial:
+https://github.com/Abalito04/Scraper-de-vuelos
+
 Tipos de viaje que debe soportar el diseño:
 1. One-way.
 2. Round-trip.

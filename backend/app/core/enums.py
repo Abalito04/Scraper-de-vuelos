@@ -1,0 +1,47 @@
+from enum import StrEnum
+
+
+class AlertStatus(StrEnum):
+    CANDIDATE = "CANDIDATE"
+    PENDING = "PENDING"
+    SENT = "SENT"
+    FAILED = "FAILED"
+    SKIPPED_DUPLICATE = "SKIPPED_DUPLICATE"
+    SKIPPED_RULE_MISMATCH = "SKIPPED_RULE_MISMATCH"
+
+
+class AlertType(StrEnum):
+    BELOW_MAX_PRICE = "BELOW_MAX_PRICE"
+    BELOW_HISTORICAL_AVERAGE = "BELOW_HISTORICAL_AVERAGE"
+    NEW_HISTORICAL_MINIMUM = "NEW_HISTORICAL_MINIMUM"
+    CUSTOM_RULE = "CUSTOM_RULE"
+
+
+class CabinClass(StrEnum):
+    ECONOMY = "ECONOMY"
+    PREMIUM_ECONOMY = "PREMIUM_ECONOMY"
+    BUSINESS = "BUSINESS"
+    FIRST = "FIRST"
+
+
+class NotificationChannel(StrEnum):
+    TELEGRAM = "TELEGRAM"
+    EMAIL = "EMAIL"
+
+
+class ProviderName(StrEnum):
+    MOCK = "MOCK"
+    AMADEUS = "AMADEUS"
+    SKYSCANNER = "SKYSCANNER"
+    DUFFEL = "DUFFEL"
+
+
+class ProviderLogStatus(StrEnum):
+    SUCCESS = "SUCCESS"
+    ERROR = "ERROR"
+
+
+class TripType(StrEnum):
+    ONE_WAY = "ONE_WAY"
+    ROUND_TRIP = "ROUND_TRIP"
+    MULTI_CITY = "MULTI_CITY"

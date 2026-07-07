@@ -6,6 +6,12 @@ El objetivo principal es permitir que un usuario configure búsquedas personaliz
 
 El proyecto está pensado como una plataforma extensible, no como un script simple. Debe poder integrarse con distintos proveedores de vuelos mediante una capa de abstracción llamada `providers`.
 
+Repositorio oficial:
+
+```txt
+https://github.com/Abalito04/Scraper-de-vuelos
+```
+
 ---
 
 ## Problema que resuelve
@@ -237,6 +243,14 @@ AMADEUS_ENV=test
 
 ## Cómo correr localmente
 
+Copiar variables de entorno:
+
+```bash
+cp .env.example .env
+```
+
+Con Docker Compose:
+
 ```bash
 docker compose up --build
 ```
@@ -257,6 +271,61 @@ Healthcheck:
 
 ```txt
 GET http://localhost:8000/health
+```
+
+Status:
+
+```txt
+GET http://localhost:8000/api/v1/status
+```
+
+Watchlists:
+
+```txt
+POST   http://localhost:8000/api/v1/watchlists
+GET    http://localhost:8000/api/v1/watchlists
+GET    http://localhost:8000/api/v1/watchlists/{watchlist_id}
+PATCH  http://localhost:8000/api/v1/watchlists/{watchlist_id}
+DELETE http://localhost:8000/api/v1/watchlists/{watchlist_id}
+```
+
+### Backend sin Docker
+
+```bash
+cd backend
+python -m venv .venv
+.venv\Scripts\activate
+pip install -e .[dev]
+uvicorn app.main:app --reload
+```
+
+Tests:
+
+```bash
+cd backend
+pytest
+```
+
+Migraciones:
+
+```bash
+cd backend
+alembic upgrade head
+```
+
+Lint:
+
+```bash
+cd backend
+ruff check .
+```
+
+### Frontend sin Docker
+
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
 ---
@@ -291,6 +360,15 @@ Scheduler: celery -A app.workers.celery_app beat --loglevel=info
 ## Estado inicial del proyecto
 
 El proyecto debe desarrollarse por fases.
+
+Estado actual:
+
+```txt
+Fase 0 — Documentación y planificación: completa
+Fase 1 — Bootstrap técnico del monorepo: completa
+Fase 2 — Modelos de base de datos y migración inicial: completa
+Fase 3 — CRUD de watchlists: completa
+```
 
 Orden recomendado:
 
